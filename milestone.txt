@@ -1,0 +1,40 @@
+CS193X Final Project Milestone
+=============================
+
+Project Name: Rune-grams
+Your Name: Maya Ziv
+Your SUNetID: mziv
+
+Overview
+--------
+On the whole things are going well! I have quite a bit of the frontend working now - drag and drop was not trivial, but I did eventually conquer it (thank god). I think I'm about halfway there; the next step is going to be implementing "persistence" via a back end server which stores the location of every rune and updates that information as the user moves things around.
+
+I'm not going to worry about real-time updates across different people visiting the site; that sounds like race condition hell. Instead, I just want it to persist between page refreshes.
+
+The third step is going to be implementing levels and a way of checking correctness! I'll also have level progression persist.
+
+Project Changes
+---------------
+Well, I may have entirely fundamentally switched projects - oops. :) This one aligns with the project expectations much better, though.
+
+API
+---
+GET /:id/home - Returns whether a specific rune is at home in the store or whether it's currently positioned elsewhere.
+
+GET /:id/coordinates - Returns the absolute position values of the rune (top and left). Only guaranteed to be meaningful if state is false.
+
+POST /:id/home - Updates the rune's state.
+
+POST /:id/coordinates - Updates the rune's absolute position values (top and left).
+
+External libraries and code
+---------------------------
+Currently no external libraries and no plans for them.
+
+Collaboration and resources
+---------------------------
+I borrowed the drag and drop strategy from this site: https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_draggable
+
+Anything else?
+--------------
+Not much, thanks for being so flexible! :)
