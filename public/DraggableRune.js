@@ -1,50 +1,40 @@
 /* A DOM component which is drag-and-droppable. */
 let BUFFER_SIZE = 25;
+let KEY_R_LEFT = "KeyA";
+let KEY_R_RIGHT = "KeyD";
 
 export default class DraggableRune {
-  constructor(imageid) {
-    this._id = imageid; /* Something like "rune8" */
+
+  constructor(clone, dropZone, onDespawn) {
     this._pos1 = 0;
     this._pos2 = 0;
     this._pos3 = 0;
     this._pos4 = 0;
+    this._rotation = 0;
 
-    this._home = true;
+    this._rune     = clone; /* Rune image element */
+    this._dropZone = dropZone; /* Table store element */
 
-    this._rune      = null; /* Rune image element */
-    this._parent    = null; /* Parent element */
-    this._tileStore = null; /* Table store element */
-
-    this._callbacks = { };
+    this._callbacks = { onDespawn };
+    console.log(this._callbacks);
 
     this._onDragStart = this._onDragStart.bind(this);
     this._onDragMove  = this._onDragMove.bind(this);
     this._onDragEnd   = this._onDragEnd.bind(this);
+    this._onKeyDown  = this._onKeyDown.bind(this);
 
-    this._createRune();
+    /* Add event listeners */
+    this._rune.addEventListener("mousedown", this._onDragStart);
   }
 
-  /* Add the rune to the DOM under parent. */
-  addToDOM(parent) {
-    this._parent = parent;
-    this._tileStore = parent.parentElement;
-    parent.appendChild(this._rune);
-  }
-
-  _createRune() {
-    let rune = document.createElement("img");
-    rune.src = "images/runes/" + this._id + ".png";
-    rune.className = "rune";
-    rune.draggable = "true";
-    rune.addEventListener("mousedown", this._onDragStart);
-    this._rune = rune;
+  removeFromDOM() {
+    this._rune.remove();
   }
 
   _onDragStart(event) {
     event.preventDefault();
     this._pos3 = event.clientX;
     this._pos4 = event.clientY;
-    this._home = false;
 
     if (this._rune.style.position !== 'absolute') {
       this._rune.style.position = 'absolute';
@@ -52,6 +42,7 @@ export default class DraggableRune {
 
     document.onmouseup = this._onDragEnd;
     document.onmousemove = this._onDragMove;
+    document.onkeydown = this._onKeyDown;
   }
 
   _onDragMove(event) {
@@ -69,20 +60,28 @@ export default class DraggableRune {
   _onDragEnd(event) {
     document.onmouseup = null;
     document.onmousemove = null;
+    document.onkeydown = null;
     let { x, y } = this._clampedPosition(event.clientX, event.clientY);
     let hoverOver = document.elementsFromPoint(x, y);
     hoverOver = hoverOver.map(x => x.id);
 
     if (hoverOver.includes("dropZone")) {
-      this._returnHome();
+      this.removeFromDOM();
+      this._callbacks.onDespawn(this); // tell main to remove us
     }
   }
 
-  _returnHome() {
-    this._rune.style.position = "relative";
-    this._rune.style.top = 0;
-    this._rune.style.left = 0;
-    this._home = true;
+  _onKeyDown(event) {
+    event.preventDefault();
+    if (event.code == KEY_R_RIGHT) {
+      this._rotation += 90;
+      if (this._rotation > 360) this._rotation = 0;
+    } else if (event.code == KEY_R_LEFT) {
+      this._rotation -= 90;
+      if (this._rotation < -360) this._rotation = 0;
+    }
+
+    this._rune.style.transform = 'rotate(' + this._rotation +'deg)'
   }
 
   _clampedPosition(x, y) {

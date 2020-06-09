@@ -10,7 +10,8 @@
 }
 
 .rune {
-  width: 73px;
+  z-index: 2;
+  width: 75px;
   height: 75px;
   top:0px;
   left:0px;
@@ -23,4 +24,23 @@
   flex-direction: row;
   align-items: center;
   justify-content: center;
+}
+
+#dragZone {
+  z-index: 0;
+  z-index:5;
+  margin-top: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#currentPuzzle {
+  z-index: 0;
+  position:absolute;
+}
+
+#clear {
+  margin-top: 50px;
+  margin-left: 10px;
 }
