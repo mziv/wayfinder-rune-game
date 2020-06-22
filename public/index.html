@@ -7,40 +7,22 @@
     <!-- These two lines provide automatic page and style reloading when files change -->
     <script src="/socket.io/socket.io.js"></script>
     <script src="/lib/client/updater.js" defer></script>
-    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="index.css">
 
     <!-- My scripts -->
-    <script type="module" src="drag.js" defer></script>
+    <script type="module" src="constants.js" defer></script>
+    <script src="index.js" defer></script>
   </head>
-  <body>
-    <div id="dropZone">
-      <table id="tileStore" cellpadding="0" border="0" cellspacing="0">
-        <tr>
-          <td id="rune1Holder" class="rune"></td>
-          <td id="rune2Holder" class="rune"></td>
-          <td id="rune0Holder" class="rune"></td>
-          <td id="rune0Holder" class="rune"></td>
-          <td id="rune0Holder" class="rune"></td>
-          <td id="rune0Holder" class="rune"></td>
-          <td id="rune0Holder" class="rune"></td>
-        </tr>
+  <body style="background-color:black;">
 
-        <tr>
-          <td id="rune8Holder" class="rune"></td>
-          <td id="rune9Holder" class="rune"></td>
-          <td id="rune10Holder" class="rune"></td>
-        </tr>
-      </table>
-    </div>
-    <!-- TODO: Eventually want to implement some bounds checking to make sure we only drag and drop inside here -->
+    <form action="/puzzle_view.html" id="gateForm" autocomplete="off" class="hide">
+      <input type="text" id="gateFormInput"><br><br>
+    </form>
 
-    <div id="dragZone">
-      <img src="images/rune puzzle 1/activation circle 50 opacity.png" width=400px
-  height=400px>
-      <img id="currentPuzzle" src="images/rune puzzle 1/puzzle.png" width=280px
-  height=295px>
-    </div>
+    <!-- <video autoplay controls> -->
+    <video autoplay>
+      <source src="images/Rune Puzzle Incantation 2.mp4" type="video/mp4">
+    </video>
 
-    <img id="clear" src="images/trash.jpg" width=100px >
   </body>
 </html>

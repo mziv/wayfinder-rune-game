@@ -3,9 +3,16 @@ let BUFFER_SIZE = 25;
 let KEY_R_LEFT = "KeyA";
 let KEY_R_RIGHT = "KeyD";
 
+let ROTATION_MODS = {
+  1:   [2],
+  90:  [3, 6],
+  180: [7, 10],
+};
+
 export default class DraggableRune {
 
-  constructor(clone, dropZone, onDespawn) {
+  constructor(id, clone, dropZone, onDespawn, onDrop) {
+    this._id = id;
     this._pos1 = 0;
     this._pos2 = 0;
     this._pos3 = 0;
@@ -15,8 +22,7 @@ export default class DraggableRune {
     this._rune     = clone; /* Rune image element */
     this._dropZone = dropZone; /* Table store element */
 
-    this._callbacks = { onDespawn };
-    console.log(this._callbacks);
+    this._callbacks = { onDespawn, onDrop };
 
     this._onDragStart = this._onDragStart.bind(this);
     this._onDragMove  = this._onDragMove.bind(this);
@@ -25,6 +31,12 @@ export default class DraggableRune {
 
     /* Add event listeners */
     this._rune.addEventListener("mousedown", this._onDragStart);
+  }
+
+  getPosition() {
+    let rect = this._rune.getBoundingClientRect();
+
+    return { id: this._id, top: rect.y, left: rect.x, rot: this._rotation };
   }
 
   removeFromDOM() {
@@ -69,16 +81,22 @@ export default class DraggableRune {
       this.removeFromDOM();
       this._callbacks.onDespawn(this); // tell main to remove us
     }
+
+    this._callbacks.onDrop(); // check solution
   }
 
   _onKeyDown(event) {
     event.preventDefault();
-    if (event.code == KEY_R_RIGHT) {
-      this._rotation += 90;
-      if (this._rotation > 360) this._rotation = 0;
-    } else if (event.code == KEY_R_LEFT) {
-      this._rotation -= 90;
-      if (this._rotation < -360) this._rotation = 0;
+    if (event.code === KEY_R_RIGHT) {
+      this._rotation += 15;
+
+      // TODO: loop thru keys in ROTATION MODS, check if id in that ones list
+
+      if (90 in ROTATION_MODS) console.log("test");
+      if (this._rotation === 360) this._rotation = 0;
+    } else if (event.code === KEY_R_LEFT) {
+      this._rotation -= 15;
+      if (this._rotation < 0) this._rotation = 360 - 15;
     }
 
     this._rune.style.transform = 'rotate(' + this._rotation +'deg)'

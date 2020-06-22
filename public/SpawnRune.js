@@ -1,7 +1,8 @@
 /* A DOM component which spawns draggable runes from a template. */
 import DraggableRune from "./DraggableRune.js";
 
-let RUNE_PATH = "images/runes/rune black ";
+// let RUNE_PATH = "images/runes/rune black ";
+let RUNE_PATH = "images/runes/rune white ";
 
 export default class SpawnRune {
   constructor(imageid) {
@@ -11,7 +12,7 @@ export default class SpawnRune {
     this._parent    = null; /* Parent element */
     this._tileStore = null; /* Table store element */
 
-    this._callbacks = { onSpawn: null, onDespawn: null };
+    this._callbacks = { onSpawn: null, onDespawn: null, onDrop: null };
 
     this._onDragStart = this._onDragStart.bind(this);
 
@@ -19,17 +20,17 @@ export default class SpawnRune {
   }
 
   /* Add the rune to the DOM under parent. */
-  addToDOM(parent, onSpawn, onDespawn) {
+  addToDOM(parent, onSpawn, onDespawn, onDrop) {
     this._parent = parent;
     this._tileStore = parent.parentElement;
     parent.appendChild(this._rune);
-    this._callbacks = { onSpawn, onDespawn };
+    this._callbacks = { onSpawn, onDespawn, onDrop };
   }
 
   _createRune() {
     let rune = document.createElement("img");
     rune.src = RUNE_PATH + this._id + ".png";
-    rune.className = "rune";
+    rune.className = "runeImg";
     rune.draggable = "true";
     rune.addEventListener("mousedown", this._onDragStart);
     this._rune = rune;
@@ -45,7 +46,7 @@ export default class SpawnRune {
     event.preventDefault();
 
     let clone = this._cloneRune();
-    let drag = new DraggableRune(clone, this._tileStore, this._callbacks.onDespawn);
+    let drag = new DraggableRune(this._id, clone, this._tileStore, this._callbacks.onDespawn, this._callbacks.onDrop);
     drag._onDragStart(event);
     this._callbacks.onSpawn(drag);
   }
