@@ -1,5 +1,8 @@
 "use strict";
 
+const MONGODB_URL = process.env.MONGODB_URL || "mongodb://localhost";
+conn = await MongoClient.connect(MONGODB_URL, { useUnifiedTopology: true });
+
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const express = require("express");
