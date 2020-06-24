@@ -11,7 +11,7 @@ let ROTATION_MODS = {
 
 export default class DraggableRune {
 
-  constructor(id, clone, dropZone, onDespawn, onDrop) {
+  constructor(id, clone, dropZone, dragZone, onDespawn, onDrop) {
     this._id = id;
     this._pos1 = 0;
     this._pos2 = 0;
@@ -21,6 +21,7 @@ export default class DraggableRune {
 
     this._rune     = clone; /* Rune image element */
     this._dropZone = dropZone; /* Table store element */
+    this._dragZone = dragZone; /* Activation circle element */
 
     this._callbacks = { onDespawn, onDrop };
 
@@ -35,8 +36,9 @@ export default class DraggableRune {
 
   getPosition() {
     let rect = this._rune.getBoundingClientRect();
+    let ref  = this._dragZone.getBoundingClientRect();
 
-    return { id: this._id, top: rect.y, left: rect.x, rot: this._rotation };
+    return { id: this._id, top: rect.y - ref.y, left: rect.x - ref.x, rot: this._rotation };
   }
 
   removeFromDOM() {

@@ -22,8 +22,8 @@ const removeAllActiveRunes = () => {
   let runePositions = "["
   activeRunes.forEach(rune => runePositions += JSON.stringify(rune.getPosition()) + ",");
   console.log(runePositions + "]");
-  activeRunes.forEach(rune => rune.removeFromDOM());
-  activeRunes = [];
+  // activeRunes.forEach(rune => rune.removeFromDOM());
+  // activeRunes = [];
 }
 
 const withinDelta = (x1, x2) => {
@@ -126,8 +126,6 @@ const main = () => {
   loadSelect();
   let puzzleLinks = document.querySelectorAll(".puzzleLink");
   for (let i = 0; i < puzzleLinks.length; i++) {
-
-    console.log(puzzleLinks[i].childNodes[0]);
     puzzleLinks[i].addEventListener("mousedown", loadLevel);
   }
 

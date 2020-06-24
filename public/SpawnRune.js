@@ -11,6 +11,7 @@ export default class SpawnRune {
     this._rune      = null; /* Rune image element */
     this._parent    = null; /* Parent element */
     this._tileStore = null; /* Table store element */
+    this._dragZone  = null; /* Activation circle element */
 
     this._callbacks = { onSpawn: null, onDespawn: null, onDrop: null };
 
@@ -23,6 +24,7 @@ export default class SpawnRune {
   addToDOM(parent, onSpawn, onDespawn, onDrop) {
     this._parent = parent;
     this._tileStore = parent.parentElement;
+    this._dragZone = document.querySelector("#dragZoneReference");
     parent.appendChild(this._rune);
     this._callbacks = { onSpawn, onDespawn, onDrop };
   }
@@ -46,7 +48,7 @@ export default class SpawnRune {
     event.preventDefault();
 
     let clone = this._cloneRune();
-    let drag = new DraggableRune(this._id, clone, this._tileStore, this._callbacks.onDespawn, this._callbacks.onDrop);
+    let drag = new DraggableRune(this._id, clone, this._tileStore, this._dragZone, this._callbacks.onDespawn, this._callbacks.onDrop);
     drag._onDragStart(event);
     this._callbacks.onSpawn(drag);
   }
