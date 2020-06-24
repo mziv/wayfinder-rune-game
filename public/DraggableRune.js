@@ -6,7 +6,8 @@ let KEY_R_RIGHT = "KeyD";
 let ROTATION_MODS = {
   1:   [2],
   90:  [3, 6],
-  180: [7, 10],
+  120: [7],
+  180: [10],
 };
 
 export default class DraggableRune {
@@ -91,14 +92,18 @@ export default class DraggableRune {
     event.preventDefault();
     if (event.code === KEY_R_RIGHT) {
       this._rotation += 15;
-
-      // TODO: loop thru keys in ROTATION MODS, check if id in that ones list
-
-      if (90 in ROTATION_MODS) console.log("test");
       if (this._rotation === 360) this._rotation = 0;
     } else if (event.code === KEY_R_LEFT) {
       this._rotation -= 15;
       if (this._rotation < 0) this._rotation = 360 - 15;
+    }
+
+    // See if this rune has any limits on how it can rotate
+    for (let [rot, runes] of Object.entries(ROTATION_MODS)) {
+      if (runes.includes(this._id)) {
+        this._rotation = this._rotation % rot;
+        break;
+      } 
     }
 
     this._rune.style.transform = 'rotate(' + this._rotation +'deg)'

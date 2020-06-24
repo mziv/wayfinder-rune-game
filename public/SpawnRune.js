@@ -24,7 +24,7 @@ export default class SpawnRune {
   addToDOM(parent, onSpawn, onDespawn, onDrop) {
     this._parent = parent;
     this._tileStore = parent.parentElement;
-    this._dragZone = document.querySelector("#dragZoneReference");
+    this._dragZone = document.querySelector("#activationCircle");
     parent.appendChild(this._rune);
     this._callbacks = { onSpawn, onDespawn, onDrop };
   }

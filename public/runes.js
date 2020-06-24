@@ -2,6 +2,10 @@ import SpawnRune from "./SpawnRune.js";
 import * as Constants from "./constants.js";
 
 let DELTA = 20;
+let COLOR_DELAY = 700; /* 1000 = one second */
+/* Fantastic color to filter site: https://codepen.io/sosuke/pen/Pjoqqp */
+let RED = "invert(61%) sepia(65%) saturate(5841%) hue-rotate(16deg) brightness(95%) contrast(97%)";
+let GREEN = "invert(23%) sepia(70%) saturate(644%) hue-rotate(81deg) brightness(102%) contrast(100%)";
 
 let puzzlePath = "images/puzzles/";
 let activeRunes = [];
@@ -22,8 +26,8 @@ const removeAllActiveRunes = () => {
   let runePositions = "["
   activeRunes.forEach(rune => runePositions += JSON.stringify(rune.getPosition()) + ",");
   console.log(runePositions + "]");
-  // activeRunes.forEach(rune => rune.removeFromDOM());
-  // activeRunes = [];
+  activeRunes.forEach(rune => rune.removeFromDOM());
+  activeRunes = [];
 }
 
 const withinDelta = (x1, x2) => {
@@ -34,17 +38,21 @@ const matches = (runePos1, runePos2) => {
   if (runePos1.id !== runePos2.id) return false;
   if (runePos1.rot !== runePos2.rot) return false;
   if (!(withinDelta(runePos1.left, runePos2.left))) return false;
-  console.log("left is good");
-  console.log(runePos1.top);
-  console.log(runePos2.top);
   if (!(withinDelta(runePos1.top, runePos2.top))) return false;
-  console.log("top is good");
   return true;
+}
+
+const activateColor = (color, delay) => {
+  let circle = document.querySelector("#activationCircle");
+  circle.style["filter"] = color;
+  setTimeout(function(){ circle.style.filter = ""; }, delay);
 }
 
 const checkSolution = () => {
   console.log("checking solution");
   let solution = Constants.PUZZLE_SOLUTIONS[curPuzzleNum];
+
+  if (solution.length !== activeRunes.length) return;
 
   let matched = new Array(solution.length).fill(false);
   for (let i = 0; i < solution.length; ++i) {
@@ -54,9 +62,12 @@ const checkSolution = () => {
     });
   }
 
-  console.log(matched);
-
-  if (matched.every(elem => elem)) loadSelect(true);
+  if (matched.every(elem => elem)) {
+    activateColor(GREEN, 3*COLOR_DELAY);
+    loadSelect(true);
+  } else {
+    activateColor(RED, COLOR_DELAY);
+  }
 }
 
 const toggleActive = (turnOn, turnOff) => {
@@ -69,38 +80,23 @@ const loadLevel = (event) => {
   console.log("Loading level: " + curPuzzleNum);
   document.querySelector("#currentPuzzle").src = puzzlePath + curPuzzleNum + ".png";
   toggleActive("#activePuzzle", "#selectPuzzle");
-
-
-  // setTimeout(function(){ fadeOut(); }, 0);
-  // setTimeout(function(){ toggleActive("#activePuzzle", "#selectPuzzle"); }, 1000);
-  // setTimeout(function(){ fadeIn(); }, 3000);
 }
-
-
 
 const loadSelect = (success) => {
-  removeAllActiveRunes();
-
   if (success) {
+    /* In this case, we just successfully completed a puzzle, so we should wait a bit before going. */
     let puzzleLinks = document.querySelectorAll(".puzzleLink");
     puzzleLinks[curPuzzleNum - 1].childNodes[0].style.opacity = 0.5;
+
+    setTimeout(function(){ 
+      toggleActive("#selectPuzzle", "#activePuzzle"); 
+      removeAllActiveRunes(); 
+    }, 2*COLOR_DELAY);
+  } else {
+    /* Otherwise, this is the first time we're loading select, and we should load immediately. */
+    toggleActive("#selectPuzzle", "#activePuzzle");
   }
-
-  toggleActive("#selectPuzzle", "#activePuzzle");
-
 }
-
-// const fadeOut = () => {
-//   console.log("fadeout");
-//   document.querySelector("#cover").style.display = 'fixed';
-//   document.querySelector("#cover").style.opacity = 1;
-// }
-
-// const fadeIn = () => {
-//   document.querySelector("#cover").style.opacity = 0;
-//   setTimeout(function(){ document.querySelector("#cover").style.display = 'none'; }, 1000);
-
-// }
 
 const main = () => {
   let runeHolders = document.querySelectorAll(".rune");
@@ -109,13 +105,9 @@ const main = () => {
     rune.addToDOM(runeHolders[i], addActiveRune, removeActiveRune, checkSolution);
   }
 
-  // let curPuzzleElem = document.querySelector("#currentPuzzle");
-  // curPuzzleNum = 1;
-
   /* TODO:
     - make it so you can only drop a rune into the circle
     - implement passwords for some runes
-    - set up hosting so quinn can test
   */
 
   let clearElem = document.querySelector("#clear");
@@ -123,15 +115,12 @@ const main = () => {
 
 
   /* Set up selection page */
-  loadSelect();
   let puzzleLinks = document.querySelectorAll(".puzzleLink");
   for (let i = 0; i < puzzleLinks.length; i++) {
     puzzleLinks[i].addEventListener("mousedown", loadLevel);
   }
 
-
-
-
+  loadSelect();
 };
 
 main();
