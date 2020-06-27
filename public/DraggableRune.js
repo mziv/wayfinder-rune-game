@@ -80,7 +80,7 @@ export default class DraggableRune {
     let hoverOver = document.elementsFromPoint(x, y);
     hoverOver = hoverOver.map(x => x.id);
 
-    if (hoverOver.includes("dropZone")) {
+    if (!(hoverOver.includes("activationCircle"))) {
       this.removeFromDOM();
       this._callbacks.onDespawn(this); // tell main to remove us
     }
