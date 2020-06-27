@@ -1,7 +1,7 @@
 /* A DOM component which is drag-and-droppable. */
 let BUFFER_SIZE = 25;
-let KEY_R_LEFT = "KeyA";
-let KEY_R_RIGHT = "KeyD";
+let KEYS_R_LEFT = ["KeyA", "ArrowLeft"];//"KeyA";
+let KEYS_R_RIGHT = ["KeyD", "ArrowRight"];//"KeyD";
 
 let ROTATION_MODS = {
   1:   [2],
@@ -90,10 +90,11 @@ export default class DraggableRune {
 
   _onKeyDown(event) {
     event.preventDefault();
-    if (event.code === KEY_R_RIGHT) {
+    console.log(event.code);
+    if (KEYS_R_RIGHT.includes(event.code)) {
       this._rotation += 15;
       if (this._rotation === 360) this._rotation = 0;
-    } else if (event.code === KEY_R_LEFT) {
+    } else if (KEYS_R_LEFT.includes(event.code)) {
       this._rotation -= 15;
       if (this._rotation < 0) this._rotation = 360 - 15;
     }
