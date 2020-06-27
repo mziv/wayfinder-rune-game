@@ -6,26 +6,30 @@ let COLOR_DELAY = 700; /* 1000 = one second */
 /* Fantastic color to filter site: https://codepen.io/sosuke/pen/Pjoqqp */
 let RED = "invert(61%) sepia(65%) saturate(5841%) hue-rotate(16deg) brightness(95%) contrast(97%)";
 let GREEN = "invert(23%) sepia(70%) saturate(644%) hue-rotate(81deg) brightness(102%) contrast(100%)";
+// let GOLD = "invert(54%) sepia(82%) saturate(2125%) hue-rotate(351deg) brightness(101%) contrast(104%)";
+let BLUE = "invert(70%) sepia(62%) saturate(2316%) hue-rotate(207deg) brightness(107%) contrast(101%)";
 
 let puzzlePath = "images/puzzles/";
 let activeRunes = [];
+let completedPuzzles = [];
 let curPuzzleNum;
+
+let gate2_unlocked = false;
+let gate3_unlocked = false;
 
 const addActiveRune = (rune) => {
   activeRunes.push(rune);
-  console.log(activeRunes);
 }
 
 const removeActiveRune = (rune) => {
   let index = activeRunes.indexOf(rune);
   activeRunes.splice(index, 1);
-  console.log(activeRunes);
 }
 
 const removeAllActiveRunes = () => {
-  let runePositions = "["
-  activeRunes.forEach(rune => runePositions += JSON.stringify(rune.getPosition()) + ",");
-  console.log(runePositions + "]");
+  // let runePositions = "["
+  // activeRunes.forEach(rune => runePositions += JSON.stringify(rune.getPosition()) + ",");
+  // console.log(runePositions + "]");
   activeRunes.forEach(rune => rune.removeFromDOM());
   activeRunes = [];
 }
@@ -48,8 +52,21 @@ const activateColor = (color, delay) => {
   setTimeout(function(){ circle.style.filter = ""; }, delay);
 }
 
+const checkProgress = () => {
+  if (completedPuzzles.includes("1") && !(gate2_unlocked)) {
+    document.querySelector("#gateForm2").style.display = "block";
+    console.log("unlocked form 2");
+  } 
+
+  for (let i = 2; i <= 4; i++) {
+    if (!(completedPuzzles.includes(i.toString()))) return;
+  }
+
+  if (!(gate3_unlocked)) document.querySelector("#gateForm3").style.display = "block";
+  console.log("unlocked form 3");
+}
+
 const checkSolution = () => {
-  console.log("checking solution");
   let solution = Constants.PUZZLE_SOLUTIONS[curPuzzleNum];
 
   if (solution.length !== activeRunes.length) return;
@@ -63,7 +80,9 @@ const checkSolution = () => {
   }
 
   if (matched.every(elem => elem)) {
-    activateColor(GREEN, 3*COLOR_DELAY);
+    completedPuzzles.push(curPuzzleNum);
+    checkProgress();
+    activateColor(GREEN, 4*COLOR_DELAY);
     loadSelect(true);
   } else {
     activateColor(RED, COLOR_DELAY);
@@ -77,24 +96,68 @@ const toggleActive = (turnOn, turnOff) => {
 
 const loadLevel = (event) => {
   curPuzzleNum = event.target.dataset.puzzleId;
-  console.log("Loading level: " + curPuzzleNum);
-  document.querySelector("#currentPuzzle").src = puzzlePath + curPuzzleNum + ".png";
-  toggleActive("#activePuzzle", "#selectPuzzle");
+
+  // If we've already solved this puzzle, load the video instead.
+  if (completedPuzzles.includes(curPuzzleNum)) {
+    loadPlayer(curPuzzleNum);
+  } else {
+    console.log("Loading level: " + curPuzzleNum);
+    document.querySelector("#currentPuzzle").src = puzzlePath + curPuzzleNum + ".png";
+    toggleActive("#activePuzzle", "#selectPuzzle");
+  }
 }
 
 const loadSelect = (success) => {
   if (success) {
     /* In this case, we just successfully completed a puzzle, so we should wait a bit before going. */
     let puzzleLinks = document.querySelectorAll(".puzzleLink");
-    puzzleLinks[curPuzzleNum - 1].childNodes[0].style.opacity = 0.5;
+    puzzleLinks[curPuzzleNum - 1].childNodes[0].style.filter = BLUE;
 
-    setTimeout(function(){ 
-      toggleActive("#selectPuzzle", "#activePuzzle"); 
+    setTimeout(function() {
       removeAllActiveRunes(); 
-    }, 2*COLOR_DELAY);
+      loadPlayer(curPuzzleNum);
+    }, 3*COLOR_DELAY);
   } else {
     /* Otherwise, this is the first time we're loading select, and we should load immediately. */
     toggleActive("#selectPuzzle", "#activePuzzle");
+  }
+}
+
+const loadPlayer = (vidNum) => {
+  document.querySelector("#selectPuzzle").style.display = "none";
+  document.querySelector("#activePuzzle").style.display = "none";
+  document.querySelector("#background").style.display = "none";
+
+  document.querySelector("#player").src = "videos/" + vidNum + ".mp4";
+  document.querySelector("#player").style.display = "block";
+  document.querySelector("#back").style.display = "block";
+  
+}
+
+const exitPlayer = () => {
+  document.querySelector("#player").style.display = "none";
+  document.querySelector("#back").style.display = "none";
+  document.querySelector("#background").style.display = "block";
+  // We'll always want to return from the player into level select.
+  toggleActive("#selectPuzzle", "#activePuzzle"); 
+}
+
+const checkGateForm = (event) => {
+  event.preventDefault();
+  let value = event.target.querySelector("input").value;
+
+  if (!(gate2_unlocked)) {
+    if (value !== Constants.PASS_2) return;
+    gate2_unlocked = true;
+    event.target.remove();
+    document.querySelector("#level2").style.display = "block";
+    return;
+  } else if (!(gate3_unlocked)) {
+    if (value !== Constants.PASS_3) return;
+    gate3_unlocked = true;
+    event.target.remove();
+    document.querySelector("#level3").style.display = "block";
+    return;
   }
 }
 
@@ -107,11 +170,13 @@ const main = () => {
 
   /* TODO:
     - make it so you can only drop a rune into the circle
-    - implement passwords for some runes
   */
 
   let clearElem = document.querySelector("#clear");
   clearElem.addEventListener('click', removeAllActiveRunes);
+
+  let backElem = document.querySelector("#back");
+  backElem.addEventListener('click', exitPlayer);
 
 
   /* Set up selection page */
@@ -119,6 +184,12 @@ const main = () => {
   for (let i = 0; i < puzzleLinks.length; i++) {
     puzzleLinks[i].addEventListener("mousedown", loadLevel);
   }
+
+  /* Set up password protection */
+  let gateForm = document.querySelector("#gateForm2");
+  gateForm.onsubmit = checkGateForm;
+  gateForm = document.querySelector("#gateForm3");
+  gateForm.onsubmit = checkGateForm;
 
   loadSelect();
 };

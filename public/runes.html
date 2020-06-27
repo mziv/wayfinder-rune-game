@@ -13,19 +13,21 @@
     <script type="module" src="constants.js" defer></script>
     <script type="module" src="runes.js" defer></script>
   </head>
-  <body>
+  <body  style="background-color:black;">
     <!-- <video autoplay>
       <source src="images/Rune Puzzle Incantation 2.mp4" type="video/mp4">
     </video> -->
 
     <video autoplay muted loop id="background">
-        <source src="images/Rune Puzzle.mp4" type="video/mp4">
+        <source src="videos/background.mp4" type="video/mp4">
     </video>
 
-    <div id="cover"></div>
+    <img id="back" src="images/back.png" width=100px>
+    <video controls id="player">
+        <source src="videos/1.mp4" type="video/mp4">
+    </video>
 
     <div id="activePuzzle">
-
       <div id="dropZone">
         <table id="tileStore" cellpadding="0" border="0" cellspacing="0">
           <tr>
@@ -60,10 +62,27 @@
 
 
     <div id="selectPuzzle">
-      <span class="puzzleLink"><img src="images/puzzles/1.png" data-puzzle-id="1" height=200px></span>
-      <span class="puzzleLink"><img src="images/puzzles/2.png" data-puzzle-id="2" height=200px></span>
-      <span class="puzzleLink"><img src="images/puzzles/3.png" data-puzzle-id="3" height=200px></span>
-      <span class="puzzleLink"><img src="images/puzzles/4.png" data-puzzle-id="4" height=200px></span>
+      <div id="level1">
+        <span class="puzzleLink"><img src="images/puzzles/1.png" data-puzzle-id="1" height=200px></span>
+      </div>
+
+      <form id="gateForm2" class="gateForm" autocomplete="off">
+        <input type="text"><br><br>
+      </form>
+      
+      <div id="level2">
+        <span class="puzzleLink"><img src="images/puzzles/2.png" data-puzzle-id="2" height=200px></span>
+        <span class="puzzleLink"><img src="images/puzzles/3.png" data-puzzle-id="3" height=200px></span>   
+        <span class="puzzleLink"><img src="images/puzzles/4.png" data-puzzle-id="4" height=200px></span>
+      </div>
+
+      <form id="gateForm3" class="gateForm" autocomplete="off">
+        <input type="text"><br><br>
+      </form>
+      
+      <div id="level3">
+        <span class="puzzleLink"><img src="images/puzzles/5.png" data-puzzle-id="5" height=200px></span>
+      </div>
     </div>
 
   </body>
