@@ -11,9 +11,9 @@
    Happy cryptid hunting!
 */
 
-export const PASS_1 = "Germalspa";
-export const PASS_2 = "Gisgraphor";
-export const PASS_3 = "Urgondrux";
+export const PASS_1 = "germalspa";
+export const PASS_2 = "gisggraphor";
+export const PASS_3 = "urgondrux";
 
 
 export const PUZZLE_SOLUTIONS = {

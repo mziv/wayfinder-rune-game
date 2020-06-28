@@ -1,5 +1,5 @@
 function checkGateForm(event) {
-  let value = document.querySelector("#gateFormInput").value;
+  let value = document.querySelector("#gateFormInput").value.toLowerCase();
   return value == GATE_PASS;
 }
 

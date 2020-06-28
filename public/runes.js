@@ -144,7 +144,7 @@ const exitPlayer = () => {
 
 const checkGateForm = (event) => {
   event.preventDefault();
-  let value = event.target.querySelector("input").value;
+  let value = event.target.querySelector("input").value.toLowerCase();
 
   if (!(gate2_unlocked)) {
     if (value !== Constants.PASS_2) return;
