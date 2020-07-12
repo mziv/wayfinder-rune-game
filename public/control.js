@@ -29,7 +29,7 @@ const tallyVotes = async () => {
 const init = async () => {
   let method = "POST";
   let opts = { method };
-  let body = { "runes": ["C", "D"] };
+  let body = { "runes": ["A", "B"] };
   if (body) {
     opts.headers = { "Content-Type": "application/json" };
     opts.body = JSON.stringify(body);
