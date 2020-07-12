@@ -1,6 +1,11 @@
 const addVoteA = async () => {
   let method = "POST";
   let opts = { method };
+  let body = {};
+  if (body) {
+    opts.headers = { "Content-Type": "application/json" };
+    opts.body = JSON.stringify(body);
+  }
   let res = await fetch("/api/votes/A/add", opts);
   let json = await res.json();
   alert(`Status: ${res.status}\n\n${JSON.stringify(json, null, 2)}`);
@@ -9,6 +14,11 @@ const addVoteA = async () => {
 const addVoteB = async () => {
   let method = "POST";
   let opts = { method };
+  let body = {};
+  if (body) {
+    opts.headers = { "Content-Type": "application/json" };
+    opts.body = JSON.stringify(body);
+  }
   let res = await fetch("/api/votes/B/add", opts);
   let json = await res.json();
   alert(`Status: ${res.status}\n\n${JSON.stringify(json, null, 2)}`);
