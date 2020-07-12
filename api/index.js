@@ -32,8 +32,13 @@ api.get("/", (req, res) => {
 });
 
 /* Initializes and resets the db. */
-api.post("/init", (req, res) => {
+api.post("/init", async (req, res) => {
   /* TODO: init db - have it take in a list of rune names */
+  let runes = req.body.runes;
+  let votes = await Votes.find().toArray();
+  votes.forEach((r) => Votes.deleteOne({ id: r.id }));
+  runes.forEach((r) => Votes.insertOne({ id: r, nVotes: 0 }));
+  res.json({ "success": true });
 });
 
 /* Get whether or not voting is complete */
@@ -70,9 +75,9 @@ api.get("/votes", async (req, res) => {
 
 /* Get the name of the rune that won. */
 api.get("/votes/winner", async (req, res) => {
-  /* TODO: test */
-  let mostVotes = Math.max.apply(Math, array.map((r) => r.nVotes));
-  let {id, nVotes} = array.find((r) => r.nVotes === mostVotes);
+  let votes = await Votes.find().toArray();
+  let mostVotes = Math.max.apply(Math, votes.map((r) => r.nVotes));
+  let {id, nVotes} = votes.find((r) => r.nVotes === mostVotes);
   res.json({ id });
 });
 

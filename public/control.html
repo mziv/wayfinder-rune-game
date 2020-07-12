@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title></title>
+
+    <!-- These two lines provide automatic page and style reloading when files change -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/lib/client/updater.js" defer></script>
+    <!-- <link rel="stylesheet" href="runes.css"> -->
+
+    <!-- My scripts -->
+    <script type="module" src="constants.js" defer></script>
+    <script type="module" src="control.js" defer></script>
+  </head>
+  <body  style="background-color:black;">
+
+    <button type="button" id="voteA">Vote A</button>
+    <button type="button" id="voteB">Vote B</button>
+    <button type="button" id="tally">Tally</button>
+    <button type="button" id="init">Init</button>
+  </body>
+</html>

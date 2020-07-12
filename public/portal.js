@@ -141,6 +141,8 @@ const exitPlayer = () => {
   toggleActive("#selectPuzzle", "#activePuzzle"); 
 }
 
+
+
 const main = () => {
   let runeHolders = document.querySelectorAll(".rune");
   for (let i = 0; i < runeHolders.length; i++) {
@@ -160,6 +162,7 @@ const main = () => {
   for (let i = 0; i < puzzleLinks.length; i++) {
     puzzleLinks[i].addEventListener("mousedown", loadLevel);
   }
+  
 
   loadSelect();
 
