@@ -6,7 +6,8 @@ const express = require("express");
 const { MongoClient } = require("mongodb");
 const MONGODB_URL = process.env.MONGODB_URL || "mongodb://localhost";
 
-let DATABASE_NAME = "runes";
+// let DATABASE_NAME = "runes";
+let DATABASE_NAME = "heroku_2t8pl3kf";
 
 let api = express.Router();
 let conn;
