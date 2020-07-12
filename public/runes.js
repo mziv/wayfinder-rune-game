@@ -1,7 +1,7 @@
 import SpawnRune from "./SpawnRune.js";
 import * as Constants from "./constants.js";
 
-let DELTA = 20;
+let DELTA = 40;
 let COLOR_DELAY = 700; /* 1000 = one second */
 /* Fantastic color to filter site: https://codepen.io/sosuke/pen/Pjoqqp */
 let RED = "invert(61%) sepia(65%) saturate(5841%) hue-rotate(16deg) brightness(95%) contrast(97%)";
@@ -14,8 +14,10 @@ let activeRunes = [];
 let completedPuzzles = [];
 let curPuzzleNum;
 
+/* Lol definitely should have taken a different strategy here */
 let gate2_unlocked = false;
 let gate3_unlocked = false;
+let gate4_unlocked = false;
 
 const addActiveRune = (rune) => {
   activeRunes.push(rune);
@@ -27,6 +29,7 @@ const removeActiveRune = (rune) => {
 }
 
 const removeAllActiveRunes = () => {
+  // console.log(curPuzzleNum);
   // let runePositions = "["
   // activeRunes.forEach(rune => runePositions += JSON.stringify(rune.getPosition()) + ",");
   // console.log(runePositions + "]");
@@ -53,17 +56,20 @@ const activateColor = (color, delay) => {
 }
 
 const checkProgress = () => {
-  if (completedPuzzles.includes("1") && !(gate2_unlocked)) {
+  if (completedPuzzles.length === 1 && !(gate2_unlocked)) {
     document.querySelector("#gateForm2").style.display = "block";
     console.log("unlocked form 2");
   } 
 
-  for (let i = 2; i <= 4; i++) {
-    if (!(completedPuzzles.includes(i.toString()))) return;
+  if (completedPuzzles.length === 4 && !(gate3_unlocked)) {
+    document.querySelector("#gateForm3").style.display = "block";
+    console.log("unlocked form 3");
   }
 
-  if (!(gate3_unlocked)) document.querySelector("#gateForm3").style.display = "block";
-  console.log("unlocked form 3");
+  if (completedPuzzles.length === 5 && !(gate4_unlocked)) {
+    document.querySelector("#gateForm4").style.display = "block";
+    console.log("unlocked form 4");
+  }
 }
 
 const checkSolution = () => {
@@ -111,7 +117,13 @@ const loadSelect = (success) => {
   if (success) {
     /* In this case, we just successfully completed a puzzle, so we should wait a bit before going. */
     let puzzleLinks = document.querySelectorAll(".puzzleLink");
-    puzzleLinks[curPuzzleNum - 1].childNodes[0].style.filter = BLUE;
+    for (let i = 0; i < puzzleLinks.length; i++) {
+      if (puzzleLinks[i].dataset.puzzleId === curPuzzleNum) {
+        puzzleLinks[i].childNodes[0].style.filter = BLUE;
+        console.log("Found a child to turn blue");
+      }
+    }
+    // puzzleLinks[curPuzzleNum - 1].childNodes[0].style.filter = BLUE;
 
     setTimeout(function() {
       removeAllActiveRunes(); 
@@ -158,6 +170,12 @@ const checkGateForm = (event) => {
     event.target.remove();
     document.querySelector("#level3").style.display = "block";
     return;
+  } else if (!(gate4_unlocked)) {
+    if (value !== Constants.PASS_4) return;
+    gate4_unlocked = true;
+    event.target.remove();
+    document.querySelector("#level4").style.display = "block";
+    return;
   }
 }
 
@@ -167,10 +185,6 @@ const main = () => {
     let rune = new SpawnRune(i + 1);
     rune.addToDOM(runeHolders[i], addActiveRune, removeActiveRune, checkSolution);
   }
-
-  /* TODO:
-    - make it so you can only drop a rune into the circle
-  */
 
   let clearElem = document.querySelector("#clear");
   clearElem.addEventListener('click', removeAllActiveRunes);
@@ -189,6 +203,8 @@ const main = () => {
   let gateForm = document.querySelector("#gateForm2");
   gateForm.onsubmit = checkGateForm;
   gateForm = document.querySelector("#gateForm3");
+  gateForm.onsubmit = checkGateForm;
+  gateForm = document.querySelector("#gateForm4");
   gateForm.onsubmit = checkGateForm;
 
   loadSelect();

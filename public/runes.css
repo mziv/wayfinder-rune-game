@@ -94,6 +94,11 @@ input {
   text-align: center;
 }
 
+#level4 {
+  display: none;
+  text-align: center;
+}
+
 /* Active Puzzle */
 
 #activePuzzle {
