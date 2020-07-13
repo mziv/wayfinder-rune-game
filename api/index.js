@@ -96,14 +96,16 @@ api.get("/votes/:id", async (req, res) => {
 
 /* Add one vote to this rune. */
 api.post("/votes/:id/add", async (req, res) => {
-  let status = await Status.findOne({ id: "config" });
-  let { votingComplete } = status;
-  if (votingComplete) {
-    res.status(404).json({ error: "Voting is closed" });
-    return;
-  }
+  console.log("add vote");
+  // let status = await Status.findOne({ id: "config" });
+  // let { votingComplete } = status;
+  // if (votingComplete) {
+  //   res.status(404).json({ error: "Voting is closed" });
+  //   return;
+  // }
 
   let id = req.params.id;
+  console.log(id);
   let rune = await Votes.findOne({ id });
   if (!rune) {
     res.status(404).json({ error: "Rune doesn't exist" });
