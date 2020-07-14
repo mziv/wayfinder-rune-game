@@ -11,11 +11,9 @@ let BLUE = "invert(70%) sepia(62%) saturate(2316%) hue-rotate(207deg) brightness
 
 let puzzlePath = "images/puzzles/";
 let activeRunes = [];
-let completedPuzzles = [];
 let curPuzzleNum;
 
-let gate2_unlocked = false;
-let gate3_unlocked = false;
+let backgroundQuery;
 
 const addActiveRune = (rune) => {
   activeRunes.push(rune);
@@ -52,40 +50,45 @@ const activateColor = (color, delay) => {
   setTimeout(function(){ circle.style.filter = ""; }, delay);
 }
 
-const checkProgress = () => {
-  if (completedPuzzles.includes("1") && !(gate2_unlocked)) {
-    document.querySelector("#gateForm2").style.display = "block";
-    console.log("unlocked form 2");
-  } 
-
-  for (let i = 2; i <= 4; i++) {
-    if (!(completedPuzzles.includes(i.toString()))) return;
-  }
-
-  if (!(gate3_unlocked)) document.querySelector("#gateForm3").style.display = "block";
-  console.log("unlocked form 3");
-}
-
 const checkSolution = () => {
   let solution = Constants.PUZZLE_SOLUTIONS[curPuzzleNum];
 
-  if (solution.length !== activeRunes.length) return;
+  // if (solution.length !== activeRunes.length) return;
 
-  let matched = new Array(solution.length).fill(false);
-  for (let i = 0; i < solution.length; ++i) {
-    activeRunes.forEach(rune => {
-      let runePos = rune.getPosition();
-      if (matches(solution[i], runePos)) matched[i] = true;
-    });
-  }
+  // let matched = new Array(solution.length).fill(false);
+  // for (let i = 0; i < solution.length; ++i) {
+  //   activeRunes.forEach(rune => {
+  //     let runePos = rune.getPosition();
+  //     if (matches(solution[i], runePos)) matched[i] = true;
+  //   });
+  // }
+
+  let matched = [true];
 
   if (matched.every(elem => elem)) {
-    completedPuzzles.push(curPuzzleNum);
+    /* SEND A VOTE FOR THIS PUZZLE */ 
+    sendVote();   
     activateColor(GREEN, 4*COLOR_DELAY);
     loadSelect(true);
   } else {
     activateColor(RED, COLOR_DELAY);
   }
+}
+
+const sendVote = async () => {
+  let method = "POST";
+  let opts = { method };
+  let body = {};
+  if (body) {
+    opts.headers = { "Content-Type": "application/json" };
+    opts.body = JSON.stringify(body);
+  }
+
+  let kw = curPuzzleNum.split(" ")[0];
+  let url = "/api/votes/" + kw + "/add";
+  let res = await fetch(url, opts);
+  let json = await res.json();
+  alert(`Status: ${res.status}\n\n${JSON.stringify(json, null, 2)}`);
 }
 
 const toggleActive = (turnOn, turnOff) => {
@@ -97,24 +100,17 @@ const loadLevel = (event) => {
   curPuzzleNum = event.target.dataset.puzzleId;
 
   // If we've already solved this puzzle, load the video instead.
-  if (completedPuzzles.includes(curPuzzleNum)) {
-    loadPlayer(curPuzzleNum);
-  } else {
-    console.log("Loading level: " + curPuzzleNum);
-    document.querySelector("#currentPuzzle").src = puzzlePath + curPuzzleNum + ".png";
-    toggleActive("#activePuzzle", "#selectPuzzle");
-  }
+  console.log("Loading level: " + curPuzzleNum);
+  document.querySelector("#currentPuzzle").src = puzzlePath + curPuzzleNum + ".png";
+  toggleActive("#activePuzzle", "#selectPuzzle");
 }
 
 const loadSelect = (success) => {
   if (success) {
-    /* In this case, we just successfully completed a puzzle, so we should wait a bit before going. */
-    let puzzleLinks = document.querySelectorAll(".puzzleLink");
-    puzzleLinks[curPuzzleNum - 1].childNodes[0].style.filter = BLUE;
-
+    /* Just turn everything off + wait once we're finished*/
     setTimeout(function() {
       removeAllActiveRunes(); 
-      loadPlayer(curPuzzleNum);
+      document.querySelector("#activePuzzle").style.display = 'none';
     }, 3*COLOR_DELAY);
   } else {
     /* Otherwise, this is the first time we're loading select, and we should load immediately. */
@@ -129,19 +125,23 @@ const loadPlayer = (vidNum) => {
 
   document.querySelector("#player").src = "videos/" + vidNum + ".mp4";
   document.querySelector("#player").style.display = "block";
-  document.querySelector("#back").style.display = "block";
-  
+  document.querySelector("#player").play();
 }
 
-const exitPlayer = () => {
-  document.querySelector("#player").style.display = "none";
-  document.querySelector("#back").style.display = "none";
-  document.querySelector("#background").style.display = "block";
-  // We'll always want to return from the player into level select.
-  toggleActive("#selectPuzzle", "#activePuzzle"); 
+const checkVotingComplete = async () => {
+  let method = "GET";
+  let opts = { method };
+  let res = await fetch("/api/status/done", opts);
+  let json = await res.json();
+  if (json.votingComplete) {
+    console.log("Voting is complete!");
+    console.log(json.winner);
+    clearInterval(backgroundQuery);
+
+    /* LOAD WINNING VIDEO */
+    loadPlayer(json.winner);
+  }
 }
-
-
 
 const main = () => {
   let runeHolders = document.querySelectorAll(".rune");
@@ -153,26 +153,16 @@ const main = () => {
   let clearElem = document.querySelector("#clear");
   clearElem.addEventListener('click', removeAllActiveRunes);
 
-  let backElem = document.querySelector("#back");
-  backElem.addEventListener('click', exitPlayer);
-
-
   /* Set up selection page */
   let puzzleLinks = document.querySelectorAll(".puzzleLink");
   for (let i = 0; i < puzzleLinks.length; i++) {
     puzzleLinks[i].addEventListener("mousedown", loadLevel);
   }
-  
 
   loadSelect();
 
-  /* 
-    alright so what do I wanna do here:
-    - when one of the levels is checked, remove everything except the background and go into waiting mode
-    separately:
-    - once per second query the db to see if voting is closed
-    - if it is, close everything and load the winning video
-  */
+  backgroundQuery = setInterval(checkVotingComplete, 1000);
+  checkVotingComplete();
 };
 
 main();

@@ -34,7 +34,8 @@ api.get("/", (req, res) => {
 
 /* Initializes and resets the db. */
 api.post("/init", async (req, res) => {
-  /* TODO: init db - have it take in a list of rune names */
+  await Status.replaceOne({ id: "config" }, { id: "config", votingComplete: false });
+
   let runes = req.body.runes;
   let votes = await Votes.find().toArray();
   votes.forEach((r) => Votes.deleteOne({ id: r.id }));
@@ -42,12 +43,22 @@ api.post("/init", async (req, res) => {
   res.json({ "success": true });
 });
 
+/* Close voting */
+api.post("/status/close", async (req, res) => {
+  await Status.replaceOne({ id: "config" }, { id: "config", votingComplete: true });
+  res.json({ "success": true });
+});
+
 /* Get whether or not voting is complete */
 api.get("/status/done", async (req, res) => {
   let status = await Status.findOne({ id: "config" });
-
   let { votingComplete } = status;
-  res.json({ votingComplete });
+
+  let response = { votingComplete };
+  if (votingComplete) {
+    response.winner = await getWinner();
+  }
+  res.json(response);
 });
 
 /* Close the voting */
@@ -75,10 +86,16 @@ api.get("/votes", async (req, res) => {
 });
 
 /* Get the name of the rune that won. */
-api.get("/votes/winner", async (req, res) => {
+const getWinner = async () => {
   let votes = await Votes.find().toArray();
   let mostVotes = Math.max.apply(Math, votes.map((r) => r.nVotes));
   let {id, nVotes} = votes.find((r) => r.nVotes === mostVotes);
+  return id;
+}
+
+/* Get the name of the rune that won. */
+api.get("/votes/winner", async (req, res) => {
+  let id = await getWinner();
   res.json({ id });
 });
 
@@ -96,16 +113,14 @@ api.get("/votes/:id", async (req, res) => {
 
 /* Add one vote to this rune. */
 api.post("/votes/:id/add", async (req, res) => {
-  console.log("add vote");
-  // let status = await Status.findOne({ id: "config" });
-  // let { votingComplete } = status;
-  // if (votingComplete) {
-  //   res.status(404).json({ error: "Voting is closed" });
-  //   return;
-  // }
+  let status = await Status.findOne({ id: "config" });
+  let { votingComplete } = status;
+  if (votingComplete) {
+    res.status(400).json({ error: "Voting is closed" });
+    return;
+  }
 
   let id = req.params.id;
-  console.log(id);
   let rune = await Votes.findOne({ id });
   if (!rune) {
     res.status(404).json({ error: "Rune doesn't exist" });

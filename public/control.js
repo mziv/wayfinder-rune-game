@@ -6,7 +6,7 @@ const addVoteA = async () => {
     opts.headers = { "Content-Type": "application/json" };
     opts.body = JSON.stringify(body);
   }
-  let res = await fetch("/api/votes/A/add", opts);
+  let res = await fetch("/api/votes/CLOSE/add", opts);
   let json = await res.json();
   alert(`Status: ${res.status}\n\n${JSON.stringify(json, null, 2)}`);
 }
@@ -19,7 +19,7 @@ const addVoteB = async () => {
     opts.headers = { "Content-Type": "application/json" };
     opts.body = JSON.stringify(body);
   }
-  let res = await fetch("/api/votes/B/add", opts);
+  let res = await fetch("/api/votes/DESTROY/add", opts);
   let json = await res.json();
   alert(`Status: ${res.status}\n\n${JSON.stringify(json, null, 2)}`);
 }
@@ -30,21 +30,38 @@ const tallyVotes = async () => {
   let res = await fetch("/api/votes", opts);
   let json = await res.json();
   alert(`Status: ${res.status}\n\n${JSON.stringify(json, null, 2)}`);
-
-  // let res = await fetch("/api/votes/winner", opts);
-  // let json = await res.json();
-  // alert(`Status: ${res.status}\n\n${JSON.stringify(json, null, 2)}`);
 }
 
 const init = async () => {
   let method = "POST";
   let opts = { method };
-  let body = { "runes": ["A", "B"] };
+  let body = { "runes": ["CLOSE", "DESTROY"] };
   if (body) {
     opts.headers = { "Content-Type": "application/json" };
     opts.body = JSON.stringify(body);
   }
   let res = await fetch("/api/init", opts);
+  let json = await res.json();
+  alert(`Status: ${res.status}\n\n${JSON.stringify(json, null, 2)}`);
+}
+
+const close = async () => {
+  let method = "POST";
+  let opts = { method };
+  let body = {};
+  if (body) {
+    opts.headers = { "Content-Type": "application/json" };
+    opts.body = JSON.stringify(body);
+  }
+  let res = await fetch("/api/status/close", opts);
+  let json = await res.json();
+  alert(`Status: ${res.status}\n\n${JSON.stringify(json, null, 2)}`);
+}
+
+const check = async () => {
+  let method = "GET";
+  let opts = { method };
+  let res = await fetch("/api/status/done", opts);
   let json = await res.json();
   alert(`Status: ${res.status}\n\n${JSON.stringify(json, null, 2)}`);
 }
@@ -61,6 +78,12 @@ const main = () => {
 
   let initB = document.querySelector("#init");
   initB.addEventListener('click', init);
+
+  initB = document.querySelector("#close");
+  initB.addEventListener('click', close);
+
+  initB = document.querySelector("#check");
+  initB.addEventListener('click', check);
 }
 
 main();
