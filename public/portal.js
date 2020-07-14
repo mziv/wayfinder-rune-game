@@ -53,17 +53,15 @@ const activateColor = (color, delay) => {
 const checkSolution = () => {
   let solution = Constants.PUZZLE_SOLUTIONS[curPuzzleNum];
 
-  // if (solution.length !== activeRunes.length) return;
+  if (solution.length !== activeRunes.length) return;
 
-  // let matched = new Array(solution.length).fill(false);
-  // for (let i = 0; i < solution.length; ++i) {
-  //   activeRunes.forEach(rune => {
-  //     let runePos = rune.getPosition();
-  //     if (matches(solution[i], runePos)) matched[i] = true;
-  //   });
-  // }
-
-  let matched = [true];
+  let matched = new Array(solution.length).fill(false);
+  for (let i = 0; i < solution.length; ++i) {
+    activeRunes.forEach(rune => {
+      let runePos = rune.getPosition();
+      if (matches(solution[i], runePos)) matched[i] = true;
+    });
+  }
 
   if (matched.every(elem => elem)) {
     /* SEND A VOTE FOR THIS PUZZLE */ 
@@ -88,7 +86,6 @@ const sendVote = async () => {
   let url = "/api/votes/" + kw + "/add";
   let res = await fetch(url, opts);
   let json = await res.json();
-  alert(`Status: ${res.status}\n\n${JSON.stringify(json, null, 2)}`);
 }
 
 const toggleActive = (turnOn, turnOff) => {
