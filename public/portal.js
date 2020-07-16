@@ -1,7 +1,7 @@
 import SpawnRune from "./SpawnRune.js";
 import * as Constants from "./constants.js";
 
-let DELTA = 20;
+let DELTA = 100;
 let COLOR_DELAY = 700; /* 1000 = one second */
 /* Fantastic color to filter site: https://codepen.io/sosuke/pen/Pjoqqp */
 let RED = "invert(61%) sepia(65%) saturate(5841%) hue-rotate(16deg) brightness(95%) contrast(97%)";
