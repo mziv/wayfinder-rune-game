@@ -6,7 +6,6 @@ let COLOR_DELAY = 700; /* 1000 = one second */
 /* Fantastic color to filter site: https://codepen.io/sosuke/pen/Pjoqqp */
 let RED = "invert(61%) sepia(65%) saturate(5841%) hue-rotate(16deg) brightness(95%) contrast(97%)";
 let GREEN = "invert(23%) sepia(70%) saturate(644%) hue-rotate(81deg) brightness(102%) contrast(100%)";
-// let GOLD = "invert(54%) sepia(82%) saturate(2125%) hue-rotate(351deg) brightness(101%) contrast(104%)";
 let BLUE = "invert(70%) sepia(62%) saturate(2316%) hue-rotate(207deg) brightness(107%) contrast(101%)";
 
 let puzzlePath = "images/puzzles/";
@@ -15,6 +14,7 @@ let completedPuzzles = [];
 let curPuzzleNum;
 
 /* Lol definitely should have taken a different strategy here */
+let GATES_ENABLED = false;
 let gate2_unlocked = false;
 let gate3_unlocked = false;
 let gate4_unlocked = false;
@@ -56,6 +56,9 @@ const activateColor = (color, delay) => {
 }
 
 const checkProgress = () => {
+  /* Progress only meaningful if the gates are enabled. */
+  if (!(GATES_ENABLED)) return; 
+
   if (completedPuzzles.length === 1 && !(gate2_unlocked)) {
     document.querySelector("#gateForm2").style.display = "block";
     console.log("unlocked form 2");
@@ -118,12 +121,10 @@ const loadSelect = (success) => {
     /* In this case, we just successfully completed a puzzle, so we should wait a bit before going. */
     let puzzleLinks = document.querySelectorAll(".puzzleLink");
     for (let i = 0; i < puzzleLinks.length; i++) {
-      if (puzzleLinks[i].dataset.puzzleId === curPuzzleNum) {
+      if (puzzleLinks[i].childNodes[0].dataset.puzzleId === curPuzzleNum) {
         puzzleLinks[i].childNodes[0].style.filter = BLUE;
-        console.log("Found a child to turn blue");
       }
     }
-    // puzzleLinks[curPuzzleNum - 1].childNodes[0].style.filter = BLUE;
 
     setTimeout(function() {
       removeAllActiveRunes(); 
@@ -200,12 +201,26 @@ const main = () => {
   }
 
   /* Set up password protection */
-  let gateForm = document.querySelector("#gateForm2");
-  gateForm.onsubmit = checkGateForm;
-  gateForm = document.querySelector("#gateForm3");
-  gateForm.onsubmit = checkGateForm;
-  gateForm = document.querySelector("#gateForm4");
-  gateForm.onsubmit = checkGateForm;
+  if (GATES_ENABLED) {
+    let gateForm = document.querySelector("#gateForm2");
+    gateForm.onsubmit = checkGateForm;
+    gateForm = document.querySelector("#gateForm3");
+    gateForm.onsubmit = checkGateForm;
+    gateForm = document.querySelector("#gateForm4");
+    gateForm.onsubmit = checkGateForm;
+  } 
+  /* Otherwise, activate everything */
+  else {
+    document.querySelector("#level2").style.display = "block";
+    document.querySelector("#level3").style.display = "block";
+    document.querySelector("#level4").style.display = "block";
+    let gateForm = document.querySelector("#gateForm2");
+    gateForm.remove();
+    gateForm = document.querySelector("#gateForm3");
+    gateForm.remove();
+    gateForm = document.querySelector("#gateForm4");
+    gateForm.remove();
+  }
 
   loadSelect();
 };
